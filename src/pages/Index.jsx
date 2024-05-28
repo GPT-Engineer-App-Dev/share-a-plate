@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Box, Container, VStack, HStack, Heading, Text, Image, Input, Textarea, Button, Link, Flex, useToast } from "@chakra-ui/react";
-import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
+import { FaFacebook, FaTwitter, FaInstagram, FaStar } from "react-icons/fa";
 
 const Index = () => {
   const [recipes, setRecipes] = useState([
@@ -9,6 +9,7 @@ const Index = () => {
   const [recipeName, setRecipeName] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [instructions, setInstructions] = useState("");
+  const [ratings, setRatings] = useState({});
   const toast = useToast();
 
   const handleSubmit = () => {
@@ -42,6 +43,19 @@ const Index = () => {
       isClosable: true,
     });
   };
+  const handleRating = (recipeIndex, rating) => {
+    setRatings((prevRatings) => ({
+      ...prevRatings,
+      [recipeIndex]: [...(prevRatings[recipeIndex] || []), rating],
+    }));
+  };
+
+  const calculateAverageRating = (ratings) => {
+    if (!ratings || ratings.length === 0) return 0;
+    const total = ratings.reduce((acc, rating) => acc + rating, 0);
+    return (total / ratings.length).toFixed(1);
+  };
+
   return (
     <Container maxW="container.xl" p={0}>
       {/* Navigation Bar */}
@@ -74,6 +88,19 @@ const Index = () => {
               <Box p={6}>
                 <Heading size="md" mb={2}>{recipe.title}</Heading>
                 <Text>{recipe.description}</Text>
+                <Box mt={4}>
+                  <Text>Average Rating: {calculateAverageRating(ratings[index])} / 5</Text>
+                  <HStack spacing={1}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <FaStar
+                        key={star}
+                        color={star <= (ratings[index]?.slice(-1)[0] || 0) ? "gold" : "gray"}
+                        onClick={() => handleRating(index, star)}
+                        cursor="pointer"
+                      />
+                    ))}
+                  </HStack>
+                </Box>
               </Box>
             </Box>
           ))}
