@@ -1,7 +1,47 @@
-import { Box, Container, VStack, HStack, Heading, Text, Image, Input, Textarea, Button, Link, Flex } from "@chakra-ui/react";
+import { useState } from "react";
+import { Box, Container, VStack, HStack, Heading, Text, Image, Input, Textarea, Button, Link, Flex, useToast } from "@chakra-ui/react";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 
 const Index = () => {
+  const [recipes, setRecipes] = useState([
+    { title: "Recipe Title", description: "Short description of the recipe.", image: "https://via.placeholder.com/150" }
+  ]);
+  const [recipeName, setRecipeName] = useState("");
+  const [ingredients, setIngredients] = useState("");
+  const [instructions, setInstructions] = useState("");
+  const toast = useToast();
+
+  const handleSubmit = () => {
+    if (!recipeName || !ingredients || !instructions) {
+      toast({
+        title: "Error",
+        description: "All fields are required.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    const newRecipe = {
+      title: recipeName,
+      description: ingredients,
+      image: "https://via.placeholder.com/150",
+    };
+
+    setRecipes([...recipes, newRecipe]);
+    setRecipeName("");
+    setIngredients("");
+    setInstructions("");
+
+    toast({
+      title: "Success",
+      description: "Recipe submitted successfully.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
+  };
   return (
     <Container maxW="container.xl" p={0}>
       {/* Navigation Bar */}
@@ -28,15 +68,15 @@ const Index = () => {
       <Box as="section" id="recipes" py={20}>
         <Heading textAlign="center" mb={10}>Recipes</Heading>
         <Flex wrap="wrap" justify="center" spacing={8}>
-          {/* Example Recipe Card */}
-          <Box maxW="sm" borderWidth="1px" borderRadius="lg" overflow="hidden" m={4}>
-            <Image src="https://via.placeholder.com/150" alt="Recipe Image" />
-            <Box p={6}>
-              <Heading size="md" mb={2}>Recipe Title</Heading>
-              <Text>Short description of the recipe.</Text>
+          {recipes.map((recipe, index) => (
+            <Box key={index} maxW="sm" borderWidth="1px" borderRadius="lg" overflow="hidden" m={4}>
+              <Image src={recipe.image} alt="Recipe Image" />
+              <Box p={6}>
+                <Heading size="md" mb={2}>{recipe.title}</Heading>
+                <Text>{recipe.description}</Text>
+              </Box>
             </Box>
-          </Box>
-          {/* Add more recipe cards as needed */}
+          ))}
         </Flex>
       </Box>
 
@@ -45,10 +85,10 @@ const Index = () => {
         <Heading mb={10}>Submit a Recipe</Heading>
         <Box maxW="md" mx="auto">
           <VStack spacing={4}>
-            <Input placeholder="Recipe Name" />
-            <Textarea placeholder="Ingredients" />
-            <Textarea placeholder="Instructions" />
-            <Button colorScheme="teal" size="lg">Submit</Button>
+            <Input placeholder="Recipe Name" value={recipeName} onChange={(e) => setRecipeName(e.target.value)} />
+            <Textarea placeholder="Ingredients" value={ingredients} onChange={(e) => setIngredients(e.target.value)} />
+            <Textarea placeholder="Instructions" value={instructions} onChange={(e) => setInstructions(e.target.value)} />
+            <Button colorScheme="teal" size="lg" onClick={handleSubmit}>Submit</Button>
           </VStack>
         </Box>
       </Box>
